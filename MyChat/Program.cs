@@ -2,14 +2,16 @@ using BLL;
 using BLL.Interfaces;
 using Entities;
 using Microsoft.EntityFrameworkCore;
+using MyChat.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 
 //Use DB
-builder.Services.AddDbContext<ChatRoomContext>(options => options.UseSqlServer(builder.Configuration["ConnectionStrings"]));
+builder.Services.AddDbContext<ChatRoomContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ChatConnection")));
 
 //DI
 builder.Services.AddTransient<IUserService, UserService>();
@@ -34,5 +36,6 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapHub<ChatHub>("/myChatHub");
 
 app.Run();
